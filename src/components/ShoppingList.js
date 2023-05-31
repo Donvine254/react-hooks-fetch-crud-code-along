@@ -3,7 +3,6 @@ import ItemForm from "./ItemForm";
 import Filter from "./Filter";
 import Item from "./Item";
 
-
 const baseUrl = "http://localhost:4000/items";
 
 function ShoppingList() {
@@ -41,27 +40,39 @@ function ShoppingList() {
       body: JSON.stringify(NewItem),
     })
       .then((response) => response.json())
-      .then((data) => setItems((prevItems)=>[...prevItems,data]));
+      .then((data) => setItems((prevItems) => [...prevItems, data]));
   }
-  function handleAddToCart(item){
-    fetch(`${baseUrl}/${item.id}`,{
-      method: 'PATCH',
-      headers:{
-        "Content-Type": "application/json"
+  function handleAddToCart(item) {
+    fetch(`${baseUrl}/${item.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         isInCart: !item.isInCart,
-      })
-    }).then(res=>res.json())
-    .then((data)=>console.log(data));
+      }),
+    })
+      .then((res) => res.json())
+      .then((updatedItem) => {
+        const updatedItems = items.map((existingItem) => {
+          if (existingItem.id === updatedItem.id) {
+            return updatedItem;
+          } else {
+            return existingItem;
+          }
+        });
+        setItems(updatedItems);
+      });
   }
 
-  function handleItemDelete(item){
-    fetch(`${baseUrl}/${item.id}`,{
-      method: 'DELETE',
-    }).then(res=>res.json())
-    .then(setItems(items.filter((items)=>items !== item)));
-
+  function handleItemDelete(item) {
+    fetch(`${baseUrl}/${item.id}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then(() =>
+        setItems(items.filter((existingItem) => existingItem.id !== item.id))
+      );
   }
 
   return (
@@ -73,7 +84,12 @@ function ShoppingList() {
       />
       <ul className="Items">
         {itemsToDisplay.map((item) => (
-          <Item key={item.id} item={item} onAddToCart={handleAddToCart} onDelete={handleItemDelete}/>
+          <Item
+            key={item.id}
+            item={item}
+            onAddToCart={handleAddToCart}
+            onDelete={handleItemDelete}
+          />
         ))}
       </ul>
     </div>
