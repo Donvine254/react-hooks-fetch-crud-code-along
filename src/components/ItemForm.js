@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 
-function ItemForm() {
+function ItemForm({ handleFormSubmit }) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Produce");
 
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (category === "" && name === "") {
+      return;
+    }
+    const NewItem = { name:name, category: category, isInCart: false };
+    console.log(NewItem);
+
+    handleFormSubmit(NewItem);
+  }
+
   return (
-    <form className="NewItem">
+    <form className="NewItem" onSubmit={handleSubmit}>
       <label>
         Name:
         <input
@@ -21,8 +32,7 @@ function ItemForm() {
         <select
           name="category"
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
+          onChange={(e) => setCategory(e.target.value)}>
           <option value="Produce">Produce</option>
           <option value="Dairy">Dairy</option>
           <option value="Dessert">Dessert</option>
